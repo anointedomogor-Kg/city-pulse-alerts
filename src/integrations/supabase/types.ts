@@ -14,16 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      incidents: {
+        Row: {
+          affected_roads: string | null
+          created_at: string
+          description: string | null
+          duration: string | null
+          id: string
+          latitude: number
+          location: string
+          longitude: number
+          reported_by: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["incident_severity"]
+          status: Database["public"]["Enums"]["incident_status"]
+          type: Database["public"]["Enums"]["incident_type"]
+        }
+        Insert: {
+          affected_roads?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          latitude: number
+          location: string
+          longitude: number
+          reported_by: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: Database["public"]["Enums"]["incident_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          type: Database["public"]["Enums"]["incident_type"]
+        }
+        Update: {
+          affected_roads?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          latitude?: number
+          location?: string
+          longitude?: number
+          reported_by?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["incident_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          type?: Database["public"]["Enums"]["incident_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          id: string
+          incident_id: string
+          read: boolean
+          sent_at: string
+          sent_to: string | null
+          sent_to_role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          id?: string
+          incident_id: string
+          read?: boolean
+          sent_at?: string
+          sent_to?: string | null
+          sent_to_role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          id?: string
+          incident_id?: string
+          read?: boolean
+          sent_at?: string
+          sent_to?: string | null
+          sent_to_role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_sent_to_fkey"
+            columns: ["sent_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          approved_at: string | null
+          company_name: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["profile_status"]
+        }
+        Insert: {
+          approved_at?: string | null
+          company_name?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["profile_status"]
+        }
+        Update: {
+          approved_at?: string | null
+          company_name?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["profile_status"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_role_val: {
+        Args: never
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "officer" | "operator" | "admin"
+      incident_severity: "critical" | "moderate" | "minor"
+      incident_status: "active" | "resolved"
+      incident_type:
+        | "Accident"
+        | "Road Block"
+        | "Flooding"
+        | "Power Outage"
+        | "Infrastructure Failure"
+        | "Public Safety"
+        | "Other"
+      profile_status: "active" | "pending" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +311,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["officer", "operator", "admin"],
+      incident_severity: ["critical", "moderate", "minor"],
+      incident_status: ["active", "resolved"],
+      incident_type: [
+        "Accident",
+        "Road Block",
+        "Flooding",
+        "Power Outage",
+        "Infrastructure Failure",
+        "Public Safety",
+        "Other",
+      ],
+      profile_status: ["active", "pending", "suspended"],
+    },
   },
 } as const
