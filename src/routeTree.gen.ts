@@ -10,16 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PendingRouteImport } from './routes/pending'
+import { Route as OperatorRouteImport } from './routes/operator'
 import { Route as OfficerRouteImport } from './routes/officer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OperatorIndexRouteImport } from './routes/operator.index'
 import { Route as OfficerIndexRouteImport } from './routes/officer.index'
+import { Route as OperatorSettingsRouteImport } from './routes/operator.settings'
+import { Route as OperatorMapRouteImport } from './routes/operator.map'
 import { Route as OfficerProfileRouteImport } from './routes/officer.profile'
 import { Route as OfficerMapRouteImport } from './routes/officer.map'
 
 const PendingRoute = PendingRouteImport.update({
   id: '/pending',
   path: '/pending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperatorRoute = OperatorRouteImport.update({
+  id: '/operator',
+  path: '/operator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfficerRoute = OfficerRouteImport.update({
@@ -37,10 +46,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OperatorIndexRoute = OperatorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OperatorRoute,
+} as any)
 const OfficerIndexRoute = OfficerIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => OfficerRoute,
+} as any)
+const OperatorSettingsRoute = OperatorSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => OperatorRoute,
+} as any)
+const OperatorMapRoute = OperatorMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => OperatorRoute,
 } as any)
 const OfficerProfileRoute = OfficerProfileRouteImport.update({
   id: '/profile',
@@ -57,10 +81,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/operator': typeof OperatorRouteWithChildren
   '/pending': typeof PendingRoute
   '/officer/map': typeof OfficerMapRoute
   '/officer/profile': typeof OfficerProfileRoute
+  '/operator/map': typeof OperatorMapRoute
+  '/operator/settings': typeof OperatorSettingsRoute
   '/officer/': typeof OfficerIndexRoute
+  '/operator/': typeof OperatorIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,17 +96,24 @@ export interface FileRoutesByTo {
   '/pending': typeof PendingRoute
   '/officer/map': typeof OfficerMapRoute
   '/officer/profile': typeof OfficerProfileRoute
+  '/operator/map': typeof OperatorMapRoute
+  '/operator/settings': typeof OperatorSettingsRoute
   '/officer': typeof OfficerIndexRoute
+  '/operator': typeof OperatorIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/operator': typeof OperatorRouteWithChildren
   '/pending': typeof PendingRoute
   '/officer/map': typeof OfficerMapRoute
   '/officer/profile': typeof OfficerProfileRoute
+  '/operator/map': typeof OperatorMapRoute
+  '/operator/settings': typeof OperatorSettingsRoute
   '/officer/': typeof OfficerIndexRoute
+  '/operator/': typeof OperatorIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,10 +121,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/officer'
+    | '/operator'
     | '/pending'
     | '/officer/map'
     | '/officer/profile'
+    | '/operator/map'
+    | '/operator/settings'
     | '/officer/'
+    | '/operator/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -97,22 +136,30 @@ export interface FileRouteTypes {
     | '/pending'
     | '/officer/map'
     | '/officer/profile'
+    | '/operator/map'
+    | '/operator/settings'
     | '/officer'
+    | '/operator'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/officer'
+    | '/operator'
     | '/pending'
     | '/officer/map'
     | '/officer/profile'
+    | '/operator/map'
+    | '/operator/settings'
     | '/officer/'
+    | '/operator/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   OfficerRoute: typeof OfficerRouteWithChildren
+  OperatorRoute: typeof OperatorRouteWithChildren
   PendingRoute: typeof PendingRoute
 }
 
@@ -123,6 +170,13 @@ declare module '@tanstack/react-router' {
       path: '/pending'
       fullPath: '/pending'
       preLoaderRoute: typeof PendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operator': {
+      id: '/operator'
+      path: '/operator'
+      fullPath: '/operator'
+      preLoaderRoute: typeof OperatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/officer': {
@@ -146,12 +200,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/operator/': {
+      id: '/operator/'
+      path: '/'
+      fullPath: '/operator/'
+      preLoaderRoute: typeof OperatorIndexRouteImport
+      parentRoute: typeof OperatorRoute
+    }
     '/officer/': {
       id: '/officer/'
       path: '/'
       fullPath: '/officer/'
       preLoaderRoute: typeof OfficerIndexRouteImport
       parentRoute: typeof OfficerRoute
+    }
+    '/operator/settings': {
+      id: '/operator/settings'
+      path: '/settings'
+      fullPath: '/operator/settings'
+      preLoaderRoute: typeof OperatorSettingsRouteImport
+      parentRoute: typeof OperatorRoute
+    }
+    '/operator/map': {
+      id: '/operator/map'
+      path: '/map'
+      fullPath: '/operator/map'
+      preLoaderRoute: typeof OperatorMapRouteImport
+      parentRoute: typeof OperatorRoute
     }
     '/officer/profile': {
       id: '/officer/profile'
@@ -185,10 +260,27 @@ const OfficerRouteChildren: OfficerRouteChildren = {
 const OfficerRouteWithChildren =
   OfficerRoute._addFileChildren(OfficerRouteChildren)
 
+interface OperatorRouteChildren {
+  OperatorMapRoute: typeof OperatorMapRoute
+  OperatorSettingsRoute: typeof OperatorSettingsRoute
+  OperatorIndexRoute: typeof OperatorIndexRoute
+}
+
+const OperatorRouteChildren: OperatorRouteChildren = {
+  OperatorMapRoute: OperatorMapRoute,
+  OperatorSettingsRoute: OperatorSettingsRoute,
+  OperatorIndexRoute: OperatorIndexRoute,
+}
+
+const OperatorRouteWithChildren = OperatorRoute._addFileChildren(
+  OperatorRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   OfficerRoute: OfficerRouteWithChildren,
+  OperatorRoute: OperatorRouteWithChildren,
   PendingRoute: PendingRoute,
 }
 export const routeTree = rootRouteImport
