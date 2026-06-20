@@ -13,6 +13,7 @@ import { Route as PendingRouteImport } from './routes/pending'
 import { Route as OfficerRouteImport } from './routes/officer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OfficerIndexRouteImport } from './routes/officer.index'
 
 const PendingRoute = PendingRouteImport.update({
   id: '/pending',
@@ -34,38 +35,45 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OfficerIndexRoute = OfficerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OfficerRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/officer': typeof OfficerRoute
+  '/officer': typeof OfficerRouteWithChildren
   '/pending': typeof PendingRoute
+  '/officer/': typeof OfficerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/officer': typeof OfficerRoute
   '/pending': typeof PendingRoute
+  '/officer': typeof OfficerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/officer': typeof OfficerRoute
+  '/officer': typeof OfficerRouteWithChildren
   '/pending': typeof PendingRoute
+  '/officer/': typeof OfficerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/officer' | '/pending'
+  fullPaths: '/' | '/auth' | '/officer' | '/pending' | '/officer/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/officer' | '/pending'
-  id: '__root__' | '/' | '/auth' | '/officer' | '/pending'
+  to: '/' | '/auth' | '/pending' | '/officer'
+  id: '__root__' | '/' | '/auth' | '/officer' | '/pending' | '/officer/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  OfficerRoute: typeof OfficerRoute
+  OfficerRoute: typeof OfficerRouteWithChildren
   PendingRoute: typeof PendingRoute
 }
 
@@ -99,13 +107,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/officer/': {
+      id: '/officer/'
+      path: '/'
+      fullPath: '/officer/'
+      preLoaderRoute: typeof OfficerIndexRouteImport
+      parentRoute: typeof OfficerRoute
+    }
   }
 }
+
+interface OfficerRouteChildren {
+  OfficerIndexRoute: typeof OfficerIndexRoute
+}
+
+const OfficerRouteChildren: OfficerRouteChildren = {
+  OfficerIndexRoute: OfficerIndexRoute,
+}
+
+const OfficerRouteWithChildren =
+  OfficerRoute._addFileChildren(OfficerRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  OfficerRoute: OfficerRoute,
+  OfficerRoute: OfficerRouteWithChildren,
   PendingRoute: PendingRoute,
 }
 export const routeTree = rootRouteImport

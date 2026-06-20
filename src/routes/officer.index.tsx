@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { IncidentMap } from "@/components/Map/IncidentMap";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
+import type { Database } from "@/integrations/supabase/types";
 import { reverseGeocode, timeAgo, severityColor } from "@/lib/format";
 import { toast } from "sonner";
 
@@ -10,7 +11,8 @@ export const Route = createFileRoute("/officer/")({
   component: ReportPage,
 });
 
-const TYPES = ["Accident", "Road Block", "Flooding", "Power Outage", "Infrastructure Failure", "Public Safety", "Other"] as const;
+type IncidentType = Database["public"]["Enums"]["incident_type"];
+const TYPES: IncidentType[] = ["Accident", "Road Block", "Flooding", "Power Outage", "Infrastructure Failure", "Public Safety", "Other"];
 const DURATIONS = ["Under 15 min", "15-30 min", "30-60 min", "1-2 hrs", "2+ hrs"];
 
 type Incident = {
@@ -20,7 +22,7 @@ type Incident = {
 
 function ReportPage() {
   const { profile } = useAuth();
-  const [type, setType] = useState<string>("Accident");
+  const [type, setType] = useState<IncidentType>("Accident");
   const [picked, setPicked] = useState<{lat:number;lng:number}|null>(null);
   const [location, setLocation] = useState("");
   const [severity, setSeverity] = useState<"critical"|"moderate"|"minor">("moderate");
@@ -54,7 +56,7 @@ function ReportPage() {
     if (!location.trim()) { toast.error("Location is required"); return; }
     setSubmitting(true);
     const { error } = await supabase.from("incidents").insert({
-      type: type as Incident["type"],
+      type,
       location,
       latitude: picked.lat,
       longitude: picked.lng,
@@ -84,7 +86,7 @@ function ReportPage() {
 
       <div className="bg-card border border-border rounded-xl p-4 space-y-4">
         <Field label="Incident type">
-          <select value={type} onChange={(e)=>setType(e.target.value)} className="input">
+          <select value={type} onChange={(e)=>setType(e.target.value as IncidentType)} className="input">
             {TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
         </Field>
