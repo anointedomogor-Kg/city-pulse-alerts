@@ -14,6 +14,8 @@ import { Route as OfficerRouteImport } from './routes/officer'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OfficerIndexRouteImport } from './routes/officer.index'
+import { Route as OfficerProfileRouteImport } from './routes/officer.profile'
+import { Route as OfficerMapRouteImport } from './routes/officer.map'
 
 const PendingRoute = PendingRouteImport.update({
   id: '/pending',
@@ -40,18 +42,32 @@ const OfficerIndexRoute = OfficerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => OfficerRoute,
 } as any)
+const OfficerProfileRoute = OfficerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => OfficerRoute,
+} as any)
+const OfficerMapRoute = OfficerMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => OfficerRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/officer': typeof OfficerRouteWithChildren
   '/pending': typeof PendingRoute
+  '/officer/map': typeof OfficerMapRoute
+  '/officer/profile': typeof OfficerProfileRoute
   '/officer/': typeof OfficerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/pending': typeof PendingRoute
+  '/officer/map': typeof OfficerMapRoute
+  '/officer/profile': typeof OfficerProfileRoute
   '/officer': typeof OfficerIndexRoute
 }
 export interface FileRoutesById {
@@ -60,14 +76,37 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/officer': typeof OfficerRouteWithChildren
   '/pending': typeof PendingRoute
+  '/officer/map': typeof OfficerMapRoute
+  '/officer/profile': typeof OfficerProfileRoute
   '/officer/': typeof OfficerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/officer' | '/pending' | '/officer/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/officer'
+    | '/pending'
+    | '/officer/map'
+    | '/officer/profile'
+    | '/officer/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/pending' | '/officer'
-  id: '__root__' | '/' | '/auth' | '/officer' | '/pending' | '/officer/'
+  to:
+    | '/'
+    | '/auth'
+    | '/pending'
+    | '/officer/map'
+    | '/officer/profile'
+    | '/officer'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/officer'
+    | '/pending'
+    | '/officer/map'
+    | '/officer/profile'
+    | '/officer/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,14 +153,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfficerIndexRouteImport
       parentRoute: typeof OfficerRoute
     }
+    '/officer/profile': {
+      id: '/officer/profile'
+      path: '/profile'
+      fullPath: '/officer/profile'
+      preLoaderRoute: typeof OfficerProfileRouteImport
+      parentRoute: typeof OfficerRoute
+    }
+    '/officer/map': {
+      id: '/officer/map'
+      path: '/map'
+      fullPath: '/officer/map'
+      preLoaderRoute: typeof OfficerMapRouteImport
+      parentRoute: typeof OfficerRoute
+    }
   }
 }
 
 interface OfficerRouteChildren {
+  OfficerMapRoute: typeof OfficerMapRoute
+  OfficerProfileRoute: typeof OfficerProfileRoute
   OfficerIndexRoute: typeof OfficerIndexRoute
 }
 
 const OfficerRouteChildren: OfficerRouteChildren = {
+  OfficerMapRoute: OfficerMapRoute,
+  OfficerProfileRoute: OfficerProfileRoute,
   OfficerIndexRoute: OfficerIndexRoute,
 }
 
