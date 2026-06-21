@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { playCriticalPing, severityColor, timeAgo } from "@/lib/format";
+import { severityColor, timeAgo } from "@/lib/format";
 import { IncidentMap } from "@/components/Map/IncidentMap";
 import { toast } from "sonner";
 
@@ -19,14 +19,11 @@ function Feed() {
   const { profile } = useAuth();
   const [list, setList] = useState<Inc[]>([]);
   const [modal, setModal] = useState<Inc | null>(null);
-  const [soundOn, setSoundOn] = useState(true);
   const seenIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    const s = localStorage.getItem("citypulse-sound");
-    if (s !== null) setSoundOn(s === "1");
     const load = async () => {
-      const { data } = await supabase.from("incidents").select("*").eq("status","active").order("created_at", { ascending: false });
+      const { data } = await supabase.from("incidents").select("*").eq("status","active").eq("archived", false).order("created_at", { ascending: false });
       const arr = (data as Inc[]) ?? [];
       arr.forEach((i) => seenIds.current.add(i.id));
       setList(arr);
@@ -38,13 +35,14 @@ function Feed() {
         if (seenIds.current.has(inc.id)) return;
         seenIds.current.add(inc.id);
         setList((prev) => [inc, ...prev]);
-        if (inc.severity === "critical" && (localStorage.getItem("citypulse-sound") ?? "1") === "1") {
-          playCriticalPing();
-        }
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "incidents" }, (payload) => {
         const inc = payload.new as Inc;
-        setList((prev) => prev.map((p) => p.id === inc.id ? inc : p).filter((p) => p.status === "active"));
+        setList((prev) =>
+          prev
+            .map((p) => (p.id === inc.id ? inc : p))
+            .filter((p) => p.status === "active" && !(inc as Inc & { archived?: boolean }).archived),
+        );
       })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
@@ -54,6 +52,14 @@ function Feed() {
     if (!profile) return;
     await supabase.from("notifications").update({ read: true }).eq("incident_id", id).eq("sent_to", profile.id);
     toast.success("Acknowledged");
+  };
+
+  const resolveIncident = async (id: string) => {
+    const { error } = await supabase.from("incidents")
+      .update({ status: "resolved", resolved_at: new Date().toISOString(), resolved_by: profile?.id })
+      .eq("id", id);
+    if (error) toast.error(error.message);
+    else toast.success("Marked resolved");
   };
 
   return (
@@ -87,6 +93,7 @@ function Feed() {
                 <div className="flex gap-2 mt-3">
                   <button onClick={() => setModal(i)} className="text-xs bg-surface-2 border border-border px-3 py-1.5 rounded-full hover:bg-[#262a36]">View on map</button>
                   <button onClick={() => acknowledge(i.id)} className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-[#178a66]">Acknowledge</button>
+                  <button onClick={() => resolveIncident(i.id)} className="text-xs bg-surface-2 border border-border px-3 py-1.5 rounded-full hover:bg-[#262a36]">Mark resolved</button>
                 </div>
               </div>
             </div>
