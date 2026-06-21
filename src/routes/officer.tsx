@@ -1,5 +1,6 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useRequireRole, useAuth } from "@/lib/use-auth";
+import { useIncidentAlerts } from "@/lib/use-incident-alerts";
 
 export const Route = createFileRoute("/officer")({
   component: OfficerLayout,
@@ -8,6 +9,7 @@ export const Route = createFileRoute("/officer")({
 function OfficerLayout() {
   useRequireRole(["officer", "admin"]);
   const { profile, signOut } = useAuth();
+  useIncidentAlerts(profile?.id);
   const { pathname } = useLocation();
 
   const tabs = [
