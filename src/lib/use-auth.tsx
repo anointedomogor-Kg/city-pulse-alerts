@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,6 +104,7 @@ export function useAuth() {
 export function useRequireRole(roles: Array<"officer" | "operator" | "admin">) {
   const auth = useAuth();
   const navigate = useNavigate();
+  const rolesKey = roles.join(",");
   useEffect(() => {
     if (auth.loading) return;
     if (!auth.session) {
@@ -115,9 +116,46 @@ export function useRequireRole(roles: Array<"officer" | "operator" | "admin">) {
       navigate({ to: "/pending" });
       return;
     }
-    if (!roles.includes(auth.profile.role)) {
+    if (!rolesKey.split(",").includes(auth.profile.role)) {
       navigate({ to: "/" });
     }
-  }, [auth.loading, auth.session, auth.profile, roles, navigate]);
+  }, [auth.loading, auth.session, auth.profile, rolesKey, navigate]);
   return auth;
+}
+
+/**
+ * Admin-only 15-minute idle auto-logout with a 1-minute warning.
+ * Returns { warning, dismissWarning } so the caller can render a modal.
+ */
+export function useAdminIdleTimeout(enabled: boolean) {
+  const { signOut } = useAuth();
+  const [warning, setWarning] = useState(false);
+  const lastActivity = useRef(Date.now());
+
+  useEffect(() => {
+    if (!enabled) return;
+    const reset = () => {
+      lastActivity.current = Date.now();
+      setWarning(false);
+    };
+    const events = ["mousemove", "keydown", "click", "scroll", "touchstart"];
+    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    const interval = setInterval(() => {
+      const idle = Date.now() - lastActivity.current;
+      if (idle >= 15 * 60_000) {
+        signOut();
+      } else if (idle >= 14 * 60_000) {
+        setWarning(true);
+      }
+    }, 5000);
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, reset));
+      clearInterval(interval);
+    };
+  }, [enabled, signOut]);
+
+  return useMemo(() => ({
+    warning,
+    dismissWarning: () => { lastActivity.current = Date.now(); setWarning(false); },
+  }), [warning]);
 }
