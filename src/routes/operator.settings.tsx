@@ -44,7 +44,7 @@ function Settings() {
           </select>
         </Field>
         <label className="flex items-center justify-between">
-          <span className="text-sm">Critical alert sound</span>
+          <span className="text-sm">Notification sound</span>
           <button onClick={() => setSound(!sound)} className={`relative w-11 h-6 rounded-full ${sound ? "bg-primary" : "bg-surface-2 border border-border"}`}>
             <span className={`absolute top-0.5 ${sound ? "right-0.5" : "left-0.5"} w-5 h-5 bg-white rounded-full`} />
           </button>
