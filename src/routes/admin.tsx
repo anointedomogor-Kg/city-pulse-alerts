@@ -48,7 +48,12 @@ function Admin() {
 
   const logAudit = async (action: string, target_id: string | null = null, details: Record<string, unknown> | null = null) => {
     if (!profile) return;
-    await supabase.from("admin_audit_log").insert({ admin_id: profile.id, action, target_id, details });
+    await supabase.from("admin_audit_log").insert({
+      admin_id: profile.id,
+      action,
+      target_id,
+      details: (details as unknown) as never,
+    });
   };
 
   const loadAll = async () => {
