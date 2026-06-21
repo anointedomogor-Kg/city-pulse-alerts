@@ -54,13 +54,6 @@ function Feed() {
     toast.success("Acknowledged");
   };
 
-  const resolveIncident = async (id: string) => {
-    const { error } = await supabase.from("incidents")
-      .update({ status: "resolved", resolved_at: new Date().toISOString(), resolved_by: profile?.id })
-      .eq("id", id);
-    if (error) toast.error(error.message);
-    else toast.success("Marked resolved");
-  };
 
   return (
     <div className="p-4 space-y-4">
@@ -93,7 +86,6 @@ function Feed() {
                 <div className="flex gap-2 mt-3">
                   <button onClick={() => setModal(i)} className="text-xs bg-surface-2 border border-border px-3 py-1.5 rounded-full hover:bg-[#262a36]">View on map</button>
                   <button onClick={() => acknowledge(i.id)} className="text-xs bg-primary text-white px-3 py-1.5 rounded-full hover:bg-[#178a66]">Acknowledge</button>
-                  <button onClick={() => resolveIncident(i.id)} className="text-xs bg-surface-2 border border-border px-3 py-1.5 rounded-full hover:bg-[#262a36]">Mark resolved</button>
                 </div>
               </div>
             </div>
