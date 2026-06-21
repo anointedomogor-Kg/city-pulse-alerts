@@ -22,7 +22,7 @@ function LiveMap() {
   const [flyTo, setFlyTo] = useState<[number, number] | null>(null);
 
   const load = async () => {
-    const { data } = await supabase.from("incidents").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("incidents").select("*").eq("archived", false).order("created_at", { ascending: false });
     setList((data as Inc[]) ?? []);
   };
 
