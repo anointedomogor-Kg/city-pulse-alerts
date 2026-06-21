@@ -14,9 +14,37 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+        }
+        Relationships: []
+      }
       incidents: {
         Row: {
           affected_roads: string | null
+          archived: boolean
           created_at: string
           description: string | null
           duration: string | null
@@ -33,6 +61,7 @@ export type Database = {
         }
         Insert: {
           affected_roads?: string | null
+          archived?: boolean
           created_at?: string
           description?: string | null
           duration?: string | null
@@ -49,6 +78,7 @@ export type Database = {
         }
         Update: {
           affected_roads?: string | null
+          archived?: boolean
           created_at?: string
           description?: string | null
           duration?: string | null
