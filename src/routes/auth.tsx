@@ -17,6 +17,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [submitting, setSubmitting] = useState(false);
+  const [fullName, setFullName] = useState("");
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/" });
@@ -34,10 +35,13 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { full_name: fullName, role: "officer" },
+          },
         });
         if (error) throw error;
-        toast.success("Account created");
+        toast.success("Officer account created");
       }
       navigate({ to: "/" });
     } catch (err) {
@@ -81,12 +85,22 @@ function AuthPage() {
           </div>
 
           <form onSubmit={handleEmail} className="space-y-3">
+            {mode === "signup" && (
+              <input
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Full name"
+                className="w-full bg-surface-2 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+              />
+            )}
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
+              placeholder="Work email"
               className="w-full bg-surface-2 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
             />
             <input
@@ -98,12 +112,17 @@ function AuthPage() {
               placeholder="Password"
               className="w-full bg-surface-2 border border-border rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
             />
+            {mode === "signup" && (
+              <div className="bg-surface-2 border border-border rounded-lg p-3 text-xs text-muted-foreground">
+                Signing up creates a <span className="text-foreground font-medium">City Officer</span> account. Operators must sign in with Google.
+              </div>
+            )}
             <button
               type="submit"
               disabled={submitting}
               className="w-full rounded-full bg-primary hover:bg-[#178a66] text-primary-foreground font-medium py-3 disabled:opacity-60"
             >
-              {submitting ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+              {submitting ? "Please wait…" : mode === "signin" ? "Sign in" : "Create officer account"}
             </button>
           </form>
 
@@ -111,12 +130,12 @@ function AuthPage() {
             onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
             className="w-full text-center text-sm text-muted-foreground hover:text-foreground mt-4"
           >
-            {mode === "signin" ? "First-time admin? Create account" : "Have an account? Sign in"}
+            {mode === "signin" ? "New city officer? Create account" : "Have an account? Sign in"}
           </button>
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-6 max-w-sm mx-auto">
-          Officers are invited by admins. Operators sign in with Google and wait for approval.
+          City officers sign in with email & password. Operators sign in with Google and wait for admin approval.
         </p>
       </div>
     </div>
