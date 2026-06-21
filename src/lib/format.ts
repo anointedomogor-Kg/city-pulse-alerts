@@ -57,3 +57,41 @@ export function playCriticalPing() {
     /* ignore */
   }
 }
+
+export function isSoundOn(): boolean {
+  if (typeof window === "undefined") return false;
+  return (localStorage.getItem("citypulse-sound") ?? "1") === "1";
+}
+
+/** Two-tone urgent for critical, single soft tone for moderate/minor. */
+export function playIncidentBeep(severity: "critical" | "moderate" | "minor") {
+  if (typeof window === "undefined") return;
+  if (!isSoundOn()) return;
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = new AC();
+    const now = ctx.currentTime;
+    const beep = (freq: number, start: number, dur: number, vol: number) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, now + start);
+      g.gain.setValueAtTime(0.0001, now + start);
+      g.gain.exponentialRampToValueAtTime(vol, now + start + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
+      o.connect(g).connect(ctx.destination);
+      o.start(now + start);
+      o.stop(now + start + dur + 0.02);
+    };
+    if (severity === "critical") {
+      beep(1320, 0, 0.18, 0.22);
+      beep(1760, 0.22, 0.22, 0.22);
+    } else if (severity === "moderate") {
+      beep(880, 0, 0.25, 0.14);
+    } else {
+      beep(660, 0, 0.2, 0.1);
+    }
+  } catch {
+    /* ignore */
+  }
+}

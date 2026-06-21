@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/use-auth";
-import { playCriticalPing, severityColor, timeAgo } from "@/lib/format";
+import { severityColor, timeAgo } from "@/lib/format";
 import { IncidentMap } from "@/components/Map/IncidentMap";
 import { toast } from "sonner";
 
@@ -19,14 +19,11 @@ function Feed() {
   const { profile } = useAuth();
   const [list, setList] = useState<Inc[]>([]);
   const [modal, setModal] = useState<Inc | null>(null);
-  const [soundOn, setSoundOn] = useState(true);
   const seenIds = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    const s = localStorage.getItem("citypulse-sound");
-    if (s !== null) setSoundOn(s === "1");
     const load = async () => {
-      const { data } = await supabase.from("incidents").select("*").eq("status","active").order("created_at", { ascending: false });
+      const { data } = await supabase.from("incidents").select("*").eq("status","active").eq("archived", false).order("created_at", { ascending: false });
       const arr = (data as Inc[]) ?? [];
       arr.forEach((i) => seenIds.current.add(i.id));
       setList(arr);
@@ -38,13 +35,14 @@ function Feed() {
         if (seenIds.current.has(inc.id)) return;
         seenIds.current.add(inc.id);
         setList((prev) => [inc, ...prev]);
-        if (inc.severity === "critical" && (localStorage.getItem("citypulse-sound") ?? "1") === "1") {
-          playCriticalPing();
-        }
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "incidents" }, (payload) => {
         const inc = payload.new as Inc;
-        setList((prev) => prev.map((p) => p.id === inc.id ? inc : p).filter((p) => p.status === "active"));
+        setList((prev) =>
+          prev
+            .map((p) => (p.id === inc.id ? inc : p))
+            .filter((p) => p.status === "active" && !(inc as Inc & { archived?: boolean }).archived),
+        );
       })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
@@ -55,6 +53,7 @@ function Feed() {
     await supabase.from("notifications").update({ read: true }).eq("incident_id", id).eq("sent_to", profile.id);
     toast.success("Acknowledged");
   };
+
 
   return (
     <div className="p-4 space-y-4">

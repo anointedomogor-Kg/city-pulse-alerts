@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-rout
 import { useEffect, useState } from "react";
 import { useRequireRole, useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { useIncidentAlerts } from "@/lib/use-incident-alerts";
 
 export const Route = createFileRoute("/operator")({
   component: OperatorLayout,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/operator")({
 function OperatorLayout() {
   useRequireRole(["operator", "admin"]);
   const { profile, signOut } = useAuth();
+  useIncidentAlerts(profile?.id);
   const [unread, setUnread] = useState(0);
   const { pathname } = useLocation();
 

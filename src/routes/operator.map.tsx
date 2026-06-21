@@ -13,7 +13,7 @@ function OpMap() {
   const [list, setList] = useState<Inc[]>([]);
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.from("incidents").select("*").eq("status","active");
+      const { data } = await supabase.from("incidents").select("*").eq("status","active").eq("archived", false);
       setList((data as Inc[]) ?? []);
     };
     load();
