@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRequireRole, useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useIncidentAlerts } from "@/lib/use-incident-alerts";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/operator")({
   component: OperatorLayout,
@@ -40,10 +41,7 @@ function OperatorLayout() {
     <div className="min-h-screen bg-background text-foreground pb-20">
       <header className="sticky top-0 z-30 bg-background/90 backdrop-blur border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/operator" className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-accent-bright pulse-dot" />
-            <span className="font-bold">CityPulse</span>
-          </Link>
+          <Link to="/operator"><Logo size={26} /></Link>
           <div className="flex items-center gap-3">
             <div className="relative">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-muted-foreground"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
