@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AuthProvider } from "@/lib/use-auth";
 import { Toaster } from "@/components/ui/sonner";
+import { useState } from "react";
+import { Splash } from "@/components/Splash";
 
 function NotFoundComponent() {
   return (
@@ -93,6 +95,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href:
+          "data:image/svg+xml;utf8," +
+          encodeURIComponent(
+            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M24 4c-8.3 0-15 6.6-15 14.7C9 30 24 44 24 44s15-14 15-25.3C39 10.6 32.3 4 24 4z' stroke='%231D9E75' stroke-width='4' fill='%230F1117'/><circle cx='24' cy='19' r='4.5' stroke='%231D9E75' stroke-width='2.5' fill='none'/><path d='M4 24 H14 L17 17 L21 31 L25 21 L29 27 L32 24 H44' stroke='%23FFFFFF' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>",
+          ),
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -117,12 +128,16 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [splashDone, setSplashDone] = useState(false);
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Outlet />
-        <Toaster theme="dark" position="top-center" />
+        {!splashDone && <Splash onDone={() => setSplashDone(true)} />}
+        <div className="page-enter">
+          <Outlet />
+        </div>
+        <Toaster theme="dark" position="top-right" />
       </AuthProvider>
     </QueryClientProvider>
   );
