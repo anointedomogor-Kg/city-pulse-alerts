@@ -6,6 +6,7 @@ import { IncidentMap, type MapPin } from "@/components/Map/IncidentMap";
 import { severityColor, timeAgo } from "@/lib/format";
 import { useIncidentAlerts } from "@/lib/use-incident-alerts";
 import { toast } from "sonner";
+import { Logo } from "@/components/Logo";
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -254,9 +255,8 @@ function Admin() {
       <header className="sticky top-0 z-30 bg-background/90 backdrop-blur border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/admin" className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-accent-bright pulse-dot" />
-            <span className="font-bold">CityPulse</span>
-            <span className="text-xs text-muted-foreground border border-border rounded px-2 py-0.5 ml-2">Admin Console</span>
+            <Logo size={26} />
+            <span className="text-xs text-muted-foreground border border-border rounded px-2 py-0.5 ml-2 font-display">Admin Console</span>
           </Link>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground hidden sm:inline">{profile?.email}</span>

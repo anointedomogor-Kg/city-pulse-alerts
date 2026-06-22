@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useRequireRole, useAuth } from "@/lib/use-auth";
 import { useIncidentAlerts } from "@/lib/use-incident-alerts";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/officer")({
   component: OfficerLayout,
@@ -22,10 +23,7 @@ function OfficerLayout() {
     <div className="min-h-screen bg-background text-foreground pb-20">
       <header className="sticky top-0 z-30 bg-background/90 backdrop-blur border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/officer" className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-accent-bright pulse-dot" />
-            <span className="font-bold tracking-tight">CityPulse</span>
-          </Link>
+          <Link to="/officer"><Logo size={26} /></Link>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground hidden sm:inline">{profile?.full_name ?? profile?.email}</span>
             <button onClick={signOut} className="text-sm text-muted-foreground hover:text-foreground">Logout</button>

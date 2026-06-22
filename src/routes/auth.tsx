@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/use-auth";
 import { toast } from "sonner";
+import { Logo } from "@/components/Logo";
+import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — CityPulse" }] }),
@@ -59,20 +61,41 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <span className="h-3 w-3 rounded-full bg-accent-bright pulse-dot" />
-            <span className="text-2xl font-bold tracking-tight">CityPulse</span>
+    <div className="relative min-h-screen overflow-hidden" style={{ background: "#0A0D14" }}>
+      <div className="absolute inset-0 grid-bg opacity-60" />
+      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full" style={{ background: "radial-gradient(circle, rgba(29,158,117,0.18), transparent 70%)" }} />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full" style={{ background: "radial-gradient(circle, rgba(63,224,168,0.10), transparent 70%)" }} />
+
+      <div className="relative grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto px-6 py-10 lg:py-20 min-h-screen items-center">
+        <div>
+          <Logo size={36} />
+          <motion.h1
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="mt-8 font-display font-bold text-4xl md:text-5xl leading-tight text-white"
+          >
+            Real-time incident coordination<br />for cities that can't wait.
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="mt-4 text-muted-foreground max-w-md"
+          >
+            Officers report from the field. Operators reroute in seconds. Admins see the whole city.
+          </motion.p>
+          <div className="mt-10 grid grid-cols-3 gap-3 max-w-md">
+            <StatPill value="23m" label="saved per incident" delay={0.3} />
+            <StatPill value="40%" label="fewer delays" delay={0.4} />
+            <StatPill value="Live" label="real-time alerts" delay={0.5} />
           </div>
-          <p className="text-sm text-muted-foreground">Real-time incident coordination</p>
         </div>
 
-        <div className="bg-card border border-border rounded-xl p-6 shadow-2xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="glass rounded-2xl p-6 sm:p-8 w-full max-w-md justify-self-center lg:justify-self-end"
+        >
+          <div className="flex items-center justify-center mb-6"><Logo size={32} /></div>
           <button
             onClick={handleGoogle}
-            className="w-full flex items-center justify-center gap-2 rounded-full border border-border bg-surface-2 hover:bg-[#262a36] text-foreground py-3 font-medium"
+            className="w-full flex items-center justify-center gap-2 rounded-full border border-border bg-surface-2 hover:bg-[#262a36] text-foreground py-3 font-medium btn-press"
           >
             <GoogleIcon />
             Continue with Google
@@ -120,7 +143,7 @@ function AuthPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-full bg-primary hover:bg-[#178a66] text-primary-foreground font-medium py-3 disabled:opacity-60"
+              className="w-full rounded-full bg-primary hover:bg-[#178a66] text-primary-foreground font-medium py-3 disabled:opacity-60 btn-press btn-shimmer"
             >
               {submitting ? "Please wait…" : mode === "signin" ? "Sign in" : "Create officer account"}
             </button>
@@ -132,13 +155,24 @@ function AuthPage() {
           >
             {mode === "signin" ? "New city officer? Create account" : "Have an account? Sign in"}
           </button>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center mt-6 max-w-sm mx-auto">
-          City officers sign in with email & password. Operators sign in with Google and wait for admin approval.
-        </p>
+          <p className="text-xs text-muted-foreground text-center mt-6">
+            Officers use email & password. Operators sign in with Google and wait for admin approval.
+          </p>
+        </motion.div>
       </div>
     </div>
+  );
+}
+
+function StatPill({ value, label, delay }: { value: string; label: string; delay: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}
+      className="bg-card/60 border border-border rounded-xl p-3"
+    >
+      <div className="font-display font-bold text-2xl text-accent-bright">{value}</div>
+      <div className="text-[11px] text-muted-foreground leading-tight">{label}</div>
+    </motion.div>
   );
 }
 

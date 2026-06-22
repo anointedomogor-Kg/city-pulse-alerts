@@ -1,6 +1,8 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/space-grotesk";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -52,15 +54,18 @@
   --color-success: var(--success);
   --color-accent-bright: var(--accent-bright);
   --color-surface-2: var(--surface-2);
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Space Grotesk Variable", "Space Grotesk", "Inter Variable", sans-serif;
 }
 
 :root {
   --radius: 0.75rem;
   /* CityPulse palette */
-  --background: #0f1117;
+  --background: #0A0D14;
+  --background-2: #0F1117;
   --foreground: #ffffff;
   --card: #1a1d27;
+  --card-hover: #1E2130;
   --card-foreground: #ffffff;
   --surface-2: #20242f;
   --popover: #1a1d27;
@@ -68,10 +73,12 @@
   --primary: #1D9E75;
   --primary-foreground: #ffffff;
   --accent-bright: #3FE0A8;
+  --primary-dark: #0D5C44;
   --secondary: #20242f;
   --secondary-foreground: #ffffff;
   --muted: #20242f;
   --muted-foreground: #8a9bb0;
+  --muted-foreground-2: #5A6B7A;
   --accent: #20242f;
   --accent-foreground: #ffffff;
   --destructive: #E24B4A;
@@ -80,6 +87,7 @@
   --moderate: #EF9F27;
   --success: #1D9E75;
   --border: #2a2d3a;
+  --border-subtle: #1E2235;
   --input: #20242f;
   --ring: #1D9E75;
   --chart-1: #1D9E75;
@@ -159,3 +167,124 @@
 .pin-marker.critical { color: #E24B4A; }
 .pin-marker.moderate { color: #EF9F27; }
 .pin-marker.minor    { color: #1D9E75; }
+
+/* ---------- CityPulse upgrade: animations & utilities ---------- */
+
+.font-display { font-family: var(--font-display); }
+
+/* Splash logo pulse line shimmer */
+@keyframes pulse-line {
+  0%, 100% { opacity: 1; transform: scaleX(1); }
+  50% { opacity: 0.55; transform: scaleX(1.04); }
+}
+.logo-pulse { transform-origin: center; animation: pulse-line 1.6s ease-in-out infinite; }
+
+@keyframes splash-bar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.splash-bar { width: 60%; animation: splash-bar 1.4s ease-in-out infinite; }
+
+/* Page enter */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: page-enter 250ms ease-out; }
+
+/* Shimmer skeleton */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #1E2235 0%, #262a36 50%, #1E2235 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+
+/* Button shimmer sweep on hover (primary) */
+.btn-shimmer { position: relative; overflow: hidden; }
+.btn-shimmer::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 600ms ease;
+}
+.btn-shimmer:hover::after { transform: translateX(100%); }
+
+.btn-press { transition: transform 100ms ease, background-color 100ms ease; }
+.btn-press:hover { transform: scale(1.03); }
+.btn-press:active { transform: scale(0.97); }
+
+/* Card hover */
+.card-hover {
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+.card-hover:hover {
+  transform: scale(1.015);
+  border-color: #1D9E75;
+  background-color: #1E2130;
+  box-shadow: 0 0 20px rgba(29,158,117,0.25), 0 8px 40px rgba(0,0,0,0.6);
+}
+
+.card-elevated { box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
+
+/* Glass card (used on auth screen) */
+.glass {
+  background: rgba(26,29,39,0.85);
+  backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(42,45,58,0.8);
+}
+.glass:focus-within { border-color: #1D9E75; box-shadow: 0 0 0 1px #1D9E75, 0 0 24px rgba(29,158,117,0.25); }
+
+/* Animated grid background */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(29,158,117,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29,158,117,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: grid-pan 18s linear infinite;
+}
+@keyframes grid-pan { from { background-position: 0 0; } to { background-position: 0 -200px; } }
+
+/* New pin ripple */
+@keyframes pin-drop {
+  0% { transform: translateY(-12px) scale(0.6); opacity: 0; }
+  60% { transform: translateY(2px) scale(1.1); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes ripple {
+  0% { transform: scale(0.4); opacity: 0.8; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+.pin-marker { animation: pin-drop 420ms cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+.pin-marker::before {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  border: 2px solid currentColor; animation: ripple 1.6s ease-out infinite;
+}
+
+/* Toast progress bar */
+[data-sonner-toast] { border: 1px solid var(--border) !important; }
+
+/* Severity chip */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 9999px; font-size: 13px;
+  background: #20242f; border: 1px solid #2a2d3a; color: #8a9bb0;
+  cursor: pointer; transition: all 150ms ease; white-space: nowrap;
+}
+.chip:hover { border-color: #1D9E75; color: #fff; }
+.chip[data-active="true"] { background: #1D9E75; border-color: #1D9E75; color: #fff; box-shadow: 0 0 18px rgba(29,158,117,0.35); }
+
+/* Focus rings */
+input:focus, select:focus, textarea:focus, button:focus-visible {
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #1D9E75 !important;
+  box-shadow: 0 0 0 3px rgba(29,158,117,0.18);
+}
+
