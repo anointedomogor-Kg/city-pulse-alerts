@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_events: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          actor_role: string | null
+          created_at: string
+          id: string
+          target: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          target?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          id?: string
+          target?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -41,6 +71,44 @@ export type Database = {
         }
         Relationships: []
       }
+      incident_comments: {
+        Row: {
+          author_email: string
+          author_id: string
+          author_role: string
+          content: string
+          created_at: string
+          id: string
+          incident_id: string
+        }
+        Insert: {
+          author_email: string
+          author_id: string
+          author_role: string
+          content: string
+          created_at?: string
+          id?: string
+          incident_id: string
+        }
+        Update: {
+          author_email?: string
+          author_id?: string
+          author_role?: string
+          content?: string
+          created_at?: string
+          id?: string
+          incident_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_comments_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incidents: {
         Row: {
           affected_roads: string | null
@@ -49,9 +117,12 @@ export type Database = {
           description: string | null
           duration: string | null
           id: string
+          last_renewed_at: string
           latitude: number
           location: string
           longitude: number
+          photo_url: string | null
+          renewal_needed: boolean
           reported_by: string
           resolved_at: string | null
           resolved_by: string | null
@@ -66,9 +137,12 @@ export type Database = {
           description?: string | null
           duration?: string | null
           id?: string
+          last_renewed_at?: string
           latitude: number
           location: string
           longitude: number
+          photo_url?: string | null
+          renewal_needed?: boolean
           reported_by: string
           resolved_at?: string | null
           resolved_by?: string | null
@@ -83,9 +157,12 @@ export type Database = {
           description?: string | null
           duration?: string | null
           id?: string
+          last_renewed_at?: string
           latitude?: number
           location?: string
           longitude?: number
+          photo_url?: string | null
+          renewal_needed?: boolean
           reported_by?: string
           resolved_at?: string | null
           resolved_by?: string | null
@@ -160,6 +237,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          last_active_at: string | null
           role: Database["public"]["Enums"]["app_role"]
           status: Database["public"]["Enums"]["profile_status"]
         }
@@ -170,6 +248,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          last_active_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["profile_status"]
         }
@@ -180,6 +259,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          last_active_at?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["profile_status"]
         }
