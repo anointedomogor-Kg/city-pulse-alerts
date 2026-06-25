@@ -24,13 +24,8 @@ function Index() {
       return;
     }
     if (!profile) return;
-    if (profile.status === "pending") {
-      navigate({ to: "/pending" });
-      return;
-    }
-    if (profile.role === "officer") navigate({ to: "/officer" });
-    else if (profile.role === "operator") navigate({ to: "/operator" });
-    else if (profile.role === "admin") navigate({ to: "/admin" });
+    if (profile.role === "admin") navigate({ to: "/admin" });
+    else navigate({ to: "/officer" });
   }, [loading, session, profile, navigate]);
 
   return (
