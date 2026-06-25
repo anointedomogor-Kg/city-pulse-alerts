@@ -40,6 +40,7 @@ function Admin() {
   const [incidents, setIncidents] = useState<Inc[]>([]);
   const [users, setUsers] = useState<Profile[]>([]);
   const [audit, setAudit] = useState<AuditEntry[]>([]);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
   const [userTab, setUserTab] = useState<"officers"|"operators"|"all">("operators");
   const [sortBy, setSortBy] = useState<keyof Inc>("created_at");
   const [range, setRange] = useState<Range>("7d");
@@ -59,14 +60,26 @@ function Admin() {
 
   const loadAll = async () => {
     const since = new Date(Date.now() - 30 * 86400000).toISOString();
-    const [{ data: incs }, { data: usrs }, { data: log }] = await Promise.all([
+    const [{ data: incs }, { data: usrs }, { data: log }, { data: comments }] = await Promise.all([
       supabase.from("incidents").select("*").gte("created_at", since).order("created_at", { ascending: false }),
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("admin_audit_log").select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.from("incident_comments").select("incident_id, author_id, content"),
     ]);
     setIncidents((incs as Inc[]) ?? []);
     setUsers((usrs as Profile[]) ?? []);
     setAudit((log as AuditEntry[]) ?? []);
+    const kw = ["resolved", "fixed", "cleared", "done"];
+    const map: Record<string, Set<string>> = {};
+    ((comments as Array<{ incident_id: string; author_id: string; content: string }>) ?? []).forEach((c) => {
+      const lc = (c.content ?? "").toLowerCase();
+      if (!kw.some((k) => lc.includes(k))) return;
+      if (!map[c.incident_id]) map[c.incident_id] = new Set();
+      map[c.incident_id].add(c.author_id);
+    });
+    const counts: Record<string, number> = {};
+    Object.entries(map).forEach(([k, v]) => { counts[k] = v.size; });
+    setCommentCounts(counts);
   };
 
   useEffect(() => {
@@ -75,6 +88,7 @@ function Admin() {
       .on("postgres_changes", { event: "*", schema: "public", table: "incidents" }, () => loadAll())
       .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => loadAll())
       .on("postgres_changes", { event: "*", schema: "public", table: "admin_audit_log" }, () => loadAll())
+      .on("postgres_changes", { event: "*", schema: "public", table: "incident_comments" }, () => loadAll())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
