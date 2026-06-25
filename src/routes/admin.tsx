@@ -442,16 +442,23 @@ function Admin() {
                         <td className="py-2 pr-3 text-muted-foreground">{timeAgo(i.created_at)}</td>
                         <td className="py-2 pr-3 text-muted-foreground">{i.resolved_at ? timeAgo(i.resolved_at) : "—"}</td>
                         <td className="py-2 pr-3">
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${i.archived ? "bg-surface-2 text-muted-foreground" : i.status==="active" ? "bg-destructive/20 text-destructive" : "bg-primary/20 text-primary"}`}>
-                            {i.archived ? "archived" : i.status}
-                          </span>
+                          <div className="flex flex-col gap-1 items-start">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${i.archived ? "bg-surface-2 text-muted-foreground" : i.status==="active" ? "bg-destructive/20 text-destructive" : "bg-primary/20 text-primary"}`}>
+                              {i.archived ? "archived" : i.status}
+                            </span>
+                            {!i.archived && (commentCounts[i.id] ?? 0) >= 3 && (
+                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-primary/20 text-primary inline-flex items-center gap-1">
+                                ✓ Community Resolved
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-2 pr-3">
                           <div className="flex gap-1">
                             {i.status === "active" && (
                               <button onClick={() => resolveIncident(i.id)} className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full hover:bg-primary/30">Resolve</button>
                             )}
-                            {i.status === "resolved" && !i.archived && (
+                            {!i.archived && (i.status === "resolved" || (commentCounts[i.id] ?? 0) >= 3) && (
                               <button onClick={() => archiveIncident(i.id)} className="text-xs bg-surface-2 border border-border px-2 py-1 rounded-full hover:bg-[#262a36]">Archive & remove</button>
                             )}
                           </div>
