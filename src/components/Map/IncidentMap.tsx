@@ -33,4 +33,4 @@ export function IncidentMap(props: Props) {
   );
 }
 
-export type { MapPin } from "./MapInner";
+export type { MapPin, RouteLine } from "./MapInner";
