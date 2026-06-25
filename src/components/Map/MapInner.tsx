@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -21,6 +21,15 @@ export type MapPin = {
   body?: React.ReactNode;
 };
 
+export type RouteLine = {
+  id: string;
+  coords: [number, number][];
+  color: string;
+  weight?: number;
+  opacity?: number;
+  dashed?: boolean;
+};
+
 function makeIcon(severity: "critical" | "moderate" | "minor") {
   return L.divIcon({
     className: "",
@@ -28,6 +37,24 @@ function makeIcon(severity: "critical" | "moderate" | "minor") {
     iconSize: [28, 28],
     iconAnchor: [14, 14],
     popupAnchor: [0, -14],
+  });
+}
+
+function userIcon() {
+  return L.divIcon({
+    className: "",
+    html: `<div class="user-marker"></div>`,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
+}
+
+function destIcon() {
+  return L.divIcon({
+    className: "",
+    html: `<div class="dest-marker">★</div>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
   });
 }
 
@@ -56,6 +83,9 @@ export default function MapInner({
   pickedMarker,
   flyTo,
   height = "100%",
+  userPos,
+  destination,
+  routes = [],
 }: {
   center?: [number, number];
   zoom?: number;
@@ -64,6 +94,9 @@ export default function MapInner({
   pickedMarker?: { lat: number; lng: number } | null;
   flyTo?: [number, number] | null;
   height?: string | number;
+  userPos?: { lat: number; lng: number } | null;
+  destination?: { lat: number; lng: number } | null;
+  routes?: RouteLine[];
 }) {
   const ref = useRef<L.Map | null>(null);
 
@@ -84,6 +117,27 @@ export default function MapInner({
       {pickedMarker && (
         <Marker position={[pickedMarker.lat, pickedMarker.lng]} icon={makeIcon("critical")} />
       )}
+      {userPos && (
+        <>
+          <Circle center={[userPos.lat, userPos.lng]} radius={80} pathOptions={{ color: "#3FE0A8", fillColor: "#3FE0A8", fillOpacity: 0.15, weight: 1 }} />
+          <Marker position={[userPos.lat, userPos.lng]} icon={userIcon()} />
+        </>
+      )}
+      {destination && (
+        <Marker position={[destination.lat, destination.lng]} icon={destIcon()} />
+      )}
+      {routes.map((r) => (
+        <Polyline
+          key={r.id}
+          positions={r.coords}
+          pathOptions={{
+            color: r.color,
+            weight: r.weight ?? 5,
+            opacity: r.opacity ?? 0.9,
+            dashArray: r.dashed ? "8 8" : undefined,
+          }}
+        />
+      ))}
       {pins.map((p) => (
         <Marker key={p.id} position={[p.lat, p.lng]} icon={makeIcon(p.severity)}>
           <Popup>
