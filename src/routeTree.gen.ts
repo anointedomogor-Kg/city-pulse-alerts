@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PendingRouteImport } from './routes/pending'
 import { Route as OperatorRouteImport } from './routes/operator'
 import { Route as OfficerRouteImport } from './routes/officer'
+import { Route as FeedRouteImport } from './routes/feed'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -35,6 +36,11 @@ const OperatorRoute = OperatorRouteImport.update({
 const OfficerRoute = OfficerRouteImport.update({
   id: '/officer',
   path: '/officer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/feed': typeof FeedRoute
   '/officer': typeof OfficerRouteWithChildren
   '/operator': typeof OperatorRouteWithChildren
   '/pending': typeof PendingRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/feed': typeof FeedRoute
   '/pending': typeof PendingRoute
   '/officer/map': typeof OfficerMapRoute
   '/officer/profile': typeof OfficerProfileRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/feed': typeof FeedRoute
   '/officer': typeof OfficerRouteWithChildren
   '/operator': typeof OperatorRouteWithChildren
   '/pending': typeof PendingRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/feed'
     | '/officer'
     | '/operator'
     | '/pending'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/feed'
     | '/pending'
     | '/officer/map'
     | '/officer/profile'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/feed'
     | '/officer'
     | '/operator'
     | '/pending'
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  FeedRoute: typeof FeedRoute
   OfficerRoute: typeof OfficerRouteWithChildren
   OperatorRoute: typeof OperatorRouteWithChildren
   PendingRoute: typeof PendingRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/officer'
       fullPath: '/officer'
       preLoaderRoute: typeof OfficerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -300,6 +320,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  FeedRoute: FeedRoute,
   OfficerRoute: OfficerRouteWithChildren,
   OperatorRoute: OperatorRouteWithChildren,
   PendingRoute: PendingRoute,
