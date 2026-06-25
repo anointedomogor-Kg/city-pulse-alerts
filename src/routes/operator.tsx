@@ -34,6 +34,7 @@ function OperatorLayout() {
   const tabs = [
     { to: "/operator", label: "Feed", exact: true },
     { to: "/operator/map", label: "Map" },
+    { to: "/feed", label: "Nearby" },
     { to: "/operator/settings", label: "Settings" },
   ];
 
@@ -54,7 +55,7 @@ function OperatorLayout() {
       </header>
       <main className="max-w-6xl mx-auto"><Outlet /></main>
       <nav className="fixed bottom-0 inset-x-0 bg-card border-t border-border z-30">
-        <div className="max-w-6xl mx-auto grid grid-cols-3">
+        <div className="max-w-6xl mx-auto grid grid-cols-4">
           {tabs.map((t) => {
             const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
             return (
