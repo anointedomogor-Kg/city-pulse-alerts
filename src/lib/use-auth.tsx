@@ -112,10 +112,6 @@ export function useRequireRole(roles: Array<"officer" | "operator" | "admin">) {
       return;
     }
     if (!auth.profile) return;
-    if (auth.profile.status === "pending") {
-      navigate({ to: "/pending" });
-      return;
-    }
     if (!rolesKey.split(",").includes(auth.profile.role)) {
       navigate({ to: "/" });
     }
